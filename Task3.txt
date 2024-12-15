@@ -1,0 +1,44 @@
+1. Update Kali Linux:
+  First update your Kali Linux system.
+> sudo apt update
+ sudo apt upgrade -y
+2.Install Suricata
+> sudo apt install suricata -y
+3.Verify Installation
+  By checking versipn of suricata 
+> suricata --version
+4.Configure Suricata
+  Edit Suricata Configuration:Suricata’s configuration file is located at following location. Open it for editing
+> sudo nano /etc/suricata/suricata.yaml
+5. Set the correct interface by modifying the interface field under the af-packet section, Replace eth0 with the name of your network interface.
+> af-packet:
+  - interface: eth0
+6. Set the HOME_NET Variable:
+   The HOME_NET variable defines the range of IP addresses that Suricata is monitoring. Set HOME_NET to your local network or IP address (e.g., 192.168.0.0/24):
+> home-net:
+  - 192.168.1.32/24
+7. Enable EVE JSON Output:
+   Suricata can output event logs in JSON format. To enable JSON output, find the eve.json section in the suricata. yaml file and make sure it’s uncommented and configured:
+> outputs:
+  - eve-log:
+      enabled: yes
+      filetype: regular
+      filename: /var/log/suricata/eve.json
+  This will log alerts and network events in JSON format to above file path.
+8. Set Up Suricata Rules
+   Suricata comes with default rule sets, but you may want to update them to get the latest detection rules: 
+> sudo suricata-update
+9.  Create Custom Rules:
+    Now you can add your custom detection rules. Suricata rules are stored in /etc/suricata/rules/. Create a custom rules file (local.rules). I put that file blank :
+> sudo nano /etc/suricata/rules/local.rules
+10. Update Suricata Configuration to Include Local Rules:
+    Check that your custom rules are loaded by adding the following line to the suricata.yaml file in the default-rule-path section:
+> rule-files:
+  - /etc/suricata/rules/local.rules
+11. Start Suricata to Monitor Traffic in IDS Mode:
+    After configuring Suricata, you can start it in IDS mode (monitoring the traffic without dropping any packets):
+> sudo suricata -c /etc/suricata/suricata.yaml -i eth0
+12. Open New Terminal to Check the Suricata Logs:
+    Suricata will log alerts to /var/log/suricata/eve.json. You can view these logs using following command:
+> cat /var/log/suricata/eve.json
+Now you are able to see logs in this file.
